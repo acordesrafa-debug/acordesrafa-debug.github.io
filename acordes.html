@@ -490,8 +490,8 @@
             document.getElementById('chordContent').style.display = 'block';
             document.getElementById('songTitleDisplay').innerText = name;
 
-            const folder = currentCategory === 'populares' ? 'Cancionero%20Popular' : 'Canciones%20para%20Dios%20Word';
-            const pdfUrl = `${folder}/${songData.pdf}#toolbar=0&navpanes=0`;
+            const folderName = currentCategory === 'populares' ? 'Cancionero Popular' : 'Canciones para Dios Word';
+            const pdfUrl = `${encodeURIComponent(folderName)}/${encodeURIComponent(songData.pdf)}#toolbar=0&navpanes=0`;
 
             // Actualizar Action Buttons (Tutorial/Cover)
             const actionArea = document.getElementById('actionButtons');
