@@ -351,7 +351,13 @@
             <span class="modal-icon">⭐</span>
             <h3 class="modal-title">Contenido Premium</h3>
             <p class="modal-text">Suscríbete para poder descargar todas las canciones en formato PDF y llevar tus acordes a donde quieras, incluso sin conexión.</p>
-            <a href="https://www.youtube.com/@AcordesRafa/join" target="_blank" class="btn btn-premium">Suscribirme Ahora</a>
+            <a href="https://www.youtube.com/@AcordesRafa/join" target="_blank" id="subscribeBtn" class="btn btn-premium" onclick="startValidation()">Suscribirme Ahora</a>
+            <div id="countdownArea" style="display: none; margin-top: 20px;">
+                <p id="countdownText" style="color: var(--stripe-blue); font-weight: 700;">Verificando suscripción... <span id="timer">10</span>s</p>
+                <div style="width: 100%; background: #eee; height: 6px; border-radius: 3px; margin-top: 10px; overflow: hidden;">
+                    <div id="progressBar" style="width: 0%; background: var(--stripe-blue); height: 100%; transition: width 1s linear;"></div>
+                </div>
+            </div>
             <p style="margin-top: 15px; font-size: 0.8rem; color: #999;">Apoya el crecimiento de Acordes Rafa</p>
         </div>
     </div>
@@ -667,6 +673,44 @@
             }
         }
 
+        let validationInterval;
+
+        function startValidation() {
+            const btn = document.getElementById('subscribeBtn');
+            const countdownArea = document.getElementById('countdownArea');
+            const timerSpan = document.getElementById('timer');
+            const progressBar = document.getElementById('progressBar');
+            
+            btn.style.display = 'none';
+            countdownArea.style.display = 'block';
+            
+            let timeLeft = 10;
+            validationInterval = setInterval(() => {
+                timeLeft--;
+                timerSpan.innerText = timeLeft;
+                progressBar.style.width = `${(10 - timeLeft) * 10}%`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(validationInterval);
+                    localStorage.setItem('acordes_rafa_premium', 'true');
+                    
+                    document.getElementById('countdownText').innerHTML = "✅ ¡Suscripción Verificada! Desbloqueando...";
+                    
+                    setTimeout(() => {
+                        closeModal();
+                        // Resetear para la próxima vez
+                        btn.style.display = 'flex';
+                        countdownArea.style.display = 'none';
+                        timerSpan.innerText = '10';
+                        progressBar.style.width = '0%';
+                        
+                        // Opcional: Notificar al usuario que ya puede descargar
+                        alert("¡Felicidades! Ya puedes descargar todas las canciones en PDF.");
+                    }, 1500);
+                }
+            }, 1000);
+        }
+
         function openModal() {
             const modal = document.getElementById('subscriptionModal');
             modal.classList.add('active');
@@ -675,6 +719,7 @@
         function closeModal() {
             const modal = document.getElementById('subscriptionModal');
             modal.classList.remove('active');
+            if (validationInterval) clearInterval(validationInterval);
         }
 
         // Cerrar modal al hacer clic fuera
