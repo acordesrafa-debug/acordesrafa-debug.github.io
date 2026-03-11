@@ -471,7 +471,7 @@ function renderInteractiveFretboard() {
         const isOpen = !isMuted && (currentFretStr === '0' || currentFretStr === '');
         
         // String name / open click area
-        svg += `<g class="fret-cell" onclick="handleFretClick(${strIdx}, 0)">
+        svg += `<g class="fret-cell" onclick="handleFretClick(${strIdx}, 0)" ondblclick="clearFret(${strIdx})">
             <rect x="${RIGHT}" y="${y - strH/2}" width="40" height="${strH}" fill="transparent" />
             <text x="${RIGHT + 25}" y="${y + 4}" font-size="14" fill="${isMuted ? 'var(--muted)' : 'var(--accent)'}" font-weight="700" text-anchor="middle" font-family="var(--mono)">${stringNames[i]}</text>
         </g>`;
@@ -491,7 +491,7 @@ function renderInteractiveFretboard() {
             const cx = RIGHT - (f - 0.5) * fretW;
             const isActive = !isMuted && currentFretStr === f.toString();
             
-            svg += `<g class="fret-cell" onclick="handleFretClick(${strIdx}, ${f})">
+            svg += `<g class="fret-cell" onclick="handleFretClick(${strIdx}, ${f})" ondblclick="clearFret(${strIdx})">
                 <rect x="${RIGHT - f * fretW}" y="${y - strH/2}" width="${fretW}" height="${strH}" fill="transparent" />
             </g>`;
             
@@ -504,6 +504,24 @@ function renderInteractiveFretboard() {
     svg += '</svg>';
     const container = document.getElementById('interactiveFretboardContainer');
     if(container) container.innerHTML = svg;
+}
+
+function clearFret(strIdx) {
+    const input = document.getElementById('str' + strIdx);
+    const muteBtn = document.getElementById('mute' + strIdx);
+    if(!input) return;
+    
+    muteState[strIdx] = false;
+    input.value = '';
+    input.classList.remove('muted');
+    if(muteBtn) muteBtn.classList.remove('active');
+    
+    if (window.getSelection) {
+        window.getSelection().removeAllRanges();
+    }
+    
+    identifyChord();
+    renderInteractiveFretboard();
 }
 
 function handleFretClick(strIdx, fretVal) {
