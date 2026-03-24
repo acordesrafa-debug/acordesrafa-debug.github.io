@@ -3,12 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Letras con Acordes | Acordes Rafa</title>
+    <title>Letras con Acordes de Guitarra | Acordes Rafa</title>
+    <meta name="description" content="Busca y descarga letras con acordes de tus canciones favoritas. Cancionero popular y música cristiana para guitarra con tutoriales en video.">
+    <meta name="keywords" content="letras con acordes, acordes de guitarra pdf, cancionero popular guitarra, acordes cristianos guitarra">
+    <link rel="canonical" href="https://acordesrafa.github.io/acordes.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Letras con Acordes de Guitarra | Acordes Rafa">
+    <meta property="og:description" content="Busca y descarga letras con acordes de tus canciones favoritas. Cancionero popular y música cristiana.">
+    <meta property="og:image" content="https://acordesrafa.github.io/Iconogrande.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Letras con Acordes de Guitarra | Acordes Rafa">
+    <meta property="twitter:description" content="Busca y descarga letras con acordes de tus canciones favoritas. Cancionero popular y música cristiana.">
+    <meta property="twitter:image" content="https://acordesrafa.github.io/Iconogrande.jpg">
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2394918736393015"
      crossorigin="anonymous"></script>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="Fondoapp.png">
+    <link rel="icon" href="Fondoapp.webp">
     <style>
         /* Protección contra copia */
         /* body {
@@ -43,7 +58,7 @@
 
         .chords-explorer {
             padding: 20px 20px 80px;
-            max-width: 1200px;
+            max-width: 95%; /* Expandido de 1200px a casi toda la pantalla */
             margin: 0 auto;
             min-height: 80vh;
         }
@@ -77,7 +92,7 @@
         /* Layout */
         .explorer-layout {
             display: grid;
-            grid-template-columns: 350px 1fr;
+            grid-template-columns: minmax(320px, max-content) 1fr; /* Adopta el ancho del texto más largo */
             gap: 30px;
             background: white;
             border-radius: 16px;
@@ -113,6 +128,7 @@
         .song-item {
             padding: 15px 20px;
             border-bottom: 1px solid #f9f9f9;
+            border-left: 4px solid transparent;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
@@ -120,6 +136,7 @@
             gap: 12px;
             font-size: 0.95rem;
             color: var(--text-dark);
+            white-space: nowrap; /* Obliga a estirar el ancho de la caja al nombre más largo */
         }
 
         .song-item:hover {
@@ -152,7 +169,7 @@
 
         .protected-content {
             width: 100%;
-            max-width: 850px; /* Un poco más ancho para mejor lectura */
+            max-width: 100%; /* Extendemos a 100% en lugar del corte forzado a 850px */
             background: #fff;
             padding: 20px 40px; /* Reducido de 50px */
             border: 1px solid #f0f0f0;
@@ -295,7 +312,7 @@
     <header>
         <nav>
             <a href="index.html" class="logo">
-                <img src="Fondoapp.png" alt="Icono">
+                <img src="Fondoapp.webp" alt="Icono">
                 Acordes Rafa
             </a>
             <ul class="nav-links">
@@ -330,7 +347,7 @@
 
             <div class="chord-viewer-container">
                 <div id="viewerPlaceholder" class="viewer-placeholder">
-                    <img src="Fondoapp.png" alt="Logo" style="width: 80px; opacity: 0.1; margin-bottom: 20px;">
+                    <img src="Fondoapp.webp" alt="Logo" style="width: 80px; opacity: 0.1; margin-bottom: 20px;">
                     <p>Selecciona una obra para visualizar los acordes protegidos.</p>
                 </div>
 
@@ -627,7 +644,8 @@
             filtered.forEach(song => {
                 const div = document.createElement('div');
                 div.className = 'song-item';
-                div.innerHTML = `<span>📄</span> ${song}`;
+                div.dataset.song = song;
+                div.innerHTML = `<span style="flex-shrink:0; margin-top: 2px;">📄</span><span style="flex:1;">${song}</span>`;
                 div.onclick = () => loadSong(song);
                 list.appendChild(div);
             });
@@ -637,7 +655,12 @@
             const songData = cancionero[currentCategory][name];
             if (!songData) return;
 
-            document.querySelectorAll('.song-item').forEach(i => i.classList.remove('active'));
+            document.querySelectorAll('.song-item').forEach(i => {
+                i.classList.remove('active');
+                if (i.dataset.song === name) {
+                    i.classList.add('active');
+                }
+            });
             document.getElementById('viewerPlaceholder').style.display = 'none';
             document.getElementById('chordContent').style.display = 'block';
             document.getElementById('songTitleDisplay').innerText = name;
@@ -672,14 +695,41 @@
             buttonsHtml += '</div>';
             actionArea.innerHTML = buttonsHtml;
 
-            // Cargar PDF en el visor
+            // Cargar SIEMPRE el PDF original (para conservar diagramas) y añadir el texto debajo para SEO
+            const jsKey = currentCategory + '/' + songData.pdf;
+            let textualContent = '';
+            
+            if (typeof songsHtmlData !== 'undefined' && songsHtmlData[jsKey]) {
+                textualContent = `
+                    <div style="margin-top: 40px; text-align: left;">
+                        <h3 style="color: var(--stripe-blue); font-family: 'Outfit', sans-serif; font-size: 1.3rem; margin-bottom: 15px;">Letra y Acordes (Accesibilidad y SEO)</h3>
+                        <div class="chord-sheet-container" style="
+                            background: #fdfdfd; 
+                            padding: 25px; 
+                            font-family: 'Courier New', Courier, monospace; 
+                            font-size: 1.05rem; 
+                            line-height: 1.6; 
+                            white-space: pre; 
+                            overflow-x: auto; 
+                            color: #1a1a1a; 
+                            border-radius: 12px; 
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                            border: 1px solid #eee;">${songsHtmlData[jsKey]}</div>
+                    </div>
+                `;
+            }
+
             document.getElementById('textTarget').innerHTML = `
                 <div class="pdf-viewer-container">
                     <iframe src="${pdfUrl}#toolbar=0&navpanes=0"></iframe>
                 </div>
+                ${textualContent}
             `;
 
-            document.getElementById('chordContent').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Evitamos el scroll horizontal en PC para que el menú no desaparezca
+            if (window.innerWidth <= 900) {
+                document.getElementById('chordContent').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         // Lógica de Suscripción y Descarga
@@ -759,7 +809,8 @@
 
         window.onload = () => switchCategory('populares');
 
-
     </script>
+    <!-- Datos de canciones extraídas en HTML para SEO -->
+    <script src="songs_data.js"></script>
 </body>
 </html>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://acordesrafa.github.io/sitemap.xml
